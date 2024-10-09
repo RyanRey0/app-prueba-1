@@ -3,28 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de PDF</title>
+    <title>Generador de PDF Elegante</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            background-color: #f0f0f0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            animation: gradientBG 15s ease infinite;
+            background-size: 400% 400%;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 90%;
+            max-width: 1200px;
+            height: 90vh;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
         }
         .card {
-            background-color: white;
+            background-color: rgba(255, 255, 255, 0.9);
             padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            border-radius: 20px;
+            width: 100%;
+            height: auto;
+            overflow-y: auto;
+            transition: all 0.5s ease;
         }
         h1 {
             margin-top: 0;
             color: #333;
+            font-weight: 700;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
         }
         form {
             display: flex;
@@ -32,43 +57,116 @@
         }
         label {
             margin-top: 1rem;
-            color: #666;
+            color: #555;
+            font-weight: 500;
         }
         input, textarea {
             margin-top: 0.5rem;
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        input:focus, textarea:focus {
+            border-color: #667eea;
+            outline: none;
         }
         button {
-            margin-top: 1rem;
-            padding: 0.5rem;
-            background-color: #007bff;
+            margin-top: 1.5rem;
+            padding: 0.8rem;
+            background-color: #667eea;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #764ba2;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .preview {
+            background-color: #f9f9f9;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            right: 0;
+            top: 0;
+            padding: 1rem;
+            transition: all 0.5s ease;
+        }
+        #pdfFrame {
+            border: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            width: 100%;
+            height: 70%;
+        }
+        .preview button {
+            margin: 0.5rem;
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #333;
+        }
+        @media (min-width: 768px) {
+            .container {
+                flex-direction: row;
+            }
+            .card {
+                width: 40%;
+                height: 100%;
+            }
+            .preview {
+                width: 60%;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>Generador de PDF</h1>
-        <form id="dataForm">
-            <label for="name">Nombre:</label>
-            <input type="text" id="name" required>
-            
-            <label for="email">Email:</label>
-            <input type="email" id="email" required>
-            
-            <label for="message">Mensaje:</label>
-            <textarea id="message" required></textarea>
-            
-            <button type="submit">Generar PDF</button>
-        </form>
+    <div class="container">
+        <div class="card" id="formCard">
+            <h1>Generador de PDF</h1>
+            <form id="dataForm">
+                <label for="name">Nombre:</label>
+                <input type="text" id="name" required>
+                
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+                
+                <label for="message">Mensaje:</label>
+                <textarea id="message" required rows="5"></textarea>
+                
+                <button type="submit">Generar PDF</button>
+            </form>
+        </div>
+        <div id="pdfPreview" class="preview" style="display: none;">
+            <button class="close-btn" id="closePreview">X</button>
+            <h2>Previsualización del PDF</h2>
+            <iframe id="pdfFrame"></iframe>
+            <div>
+                <button id="downloadBtn">Descargar PDF</button>
+                <button id="viewBtn">Ver en otra pestaña</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -81,15 +179,46 @@
             
             const doc = new jspdf.jsPDF();
             
-            doc.setFontSize(18);
+            doc.setFontSize(22);
+            doc.setTextColor(102, 126, 234);
             doc.text('Datos del formulario', 20, 20);
             
-            doc.setFontSize(12);
+            doc.setFontSize(14);
+            doc.setTextColor(51, 51, 51);
             doc.text(`Nombre: ${name}`, 20, 40);
             doc.text(`Email: ${email}`, 20, 50);
-            doc.text(`Mensaje: ${message}`, 20, 60);
+            doc.text(`Mensaje: ${message}`, 20, 60, { maxWidth: 170 });
             
-            doc.save('formulario.pdf');
+            const pdfData = doc.output('datauristring');
+            document.getElementById('pdfFrame').src = pdfData;
+            document.getElementById('pdfPreview').style.display = 'flex';
+            
+            if (window.innerWidth >= 768) {
+                document.getElementById('formCard').style.width = '40%';
+            }
+            
+            document.getElementById('downloadBtn').addEventListener('click', function() {
+                doc.save('formulario_elegante.pdf');
+            });
+
+            document.getElementById('viewBtn').addEventListener('click', function() {
+                const pdfWindow = window.open("");
+                pdfWindow.document.write("<iframe width='100%' height='100%' src='" + pdfData + "'></iframe>");
+            });
+        });
+
+        document.getElementById('closePreview').addEventListener('click', function() {
+            document.getElementById('pdfPreview').style.display = 'none';
+            document.getElementById('formCard').style.width = '80%';
+            document.getElementById('dataForm').reset();
+        });
+
+        window.addEventListener('resize', function() {
+            if (window.innerWidth < 768) {
+                document.getElementById('formCard').style.width = '100%';
+            } else if (document.getElementById('pdfPreview').style.display === 'flex') {
+                document.getElementById('formCard').style.width = '40%';
+            }
         });
     </script>
 </body>
