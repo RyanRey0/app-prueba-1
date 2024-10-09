@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: Verdana, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -16,6 +16,16 @@
             background-color: #f0f0f0;
             animation: fadeIn 1s ease-in-out;
         }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .container {
+            display: flex;
+            width: 80%;
+            height: 80%;
+            position: relative;
+        }
         .card {
             background-color: white;
             padding: 2rem;
@@ -23,6 +33,14 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             width: 300px;
             animation: slideIn 0.5s ease-in-out;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: all 0.5s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         h1 {
             margin-top: 0;
@@ -41,10 +59,6 @@
             padding: 0.5rem;
             border: 1px solid #ddd;
             border-radius: 4px;
-            transition: border-color 0.3s;
-        }
-        input:focus, textarea:focus {
-            border-color: #007bff;
         }
         button {
             margin-top: 1rem;
@@ -54,36 +68,56 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease;
         }
         button:hover {
             background-color: #0056b3;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .preview {
+            margin-top: 1rem;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            width: 50%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: absolute;
+            right: 0;
+            top: 0;
+            animation: slideInRight 0.5s ease-in-out;
         }
-        @keyframes slideIn {
-            from { transform: translateY(-20px); }
-            to { transform: translateY(0); }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>Generador de PDF</h1>
-        <form id="dataForm">
-            <label for="name">Nombre:</label>
-            <input type="text" id="name" required>
-            
-            <label for="email">Email:</label>
-            <input type="email" id="email" required>
-            
-            <label for="message">Mensaje:</label>
-            <textarea id="message" required></textarea>
-            
-            <button type="submit">Generar PDF</button>
-        </form>
+    <div class="container">
+        <div class="card" id="formCard">
+            <h1>Generador de PDF</h1>
+            <form id="dataForm">
+                <label for="name">Nombre:</label>
+                <input type="text" id="name" required>
+                
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+                
+                <label for="message">Mensaje:</label>
+                <textarea id="message" required></textarea>
+                
+                <button type="submit">Generar PDF</button>
+            </form>
+        </div>
+        <div id="pdfPreview" class="preview" style="display: none;">
+            <h2>Previsualización del PDF</h2>
+            <iframe id="pdfFrame" width="100%" height="100%"></iframe>
+            <button id="downloadBtn">Descargar PDF</button>
+            <button id="viewBtn">Ver en otra pestaña</button>
+        </div>
     </div>
 
     <script>
@@ -104,7 +138,21 @@
             doc.text(`Email: ${email}`, 20, 50);
             doc.text(`Mensaje: ${message}`, 20, 60);
             
-            doc.save('formulario.pdf');
+            const pdfData = doc.output('datauristring');
+            document.getElementById('pdfFrame').src = pdfData;
+            document.getElementById('pdfPreview').style.display = 'block';
+            
+            document.getElementById('formCard').style.left = '0';
+            document.getElementById('formCard').style.transform = 'translateX(0)';
+            
+            document.getElementById('downloadBtn').addEventListener('click', function() {
+                doc.save('formulario.pdf');
+            });
+
+            document.getElementById('viewBtn').addEventListener('click', function() {
+                const pdfWindow = window.open("");
+                pdfWindow.document.write("<iframe width='100%' height='100%' src='" + pdfData + "'></iframe>");
+            });
         });
     </script>
 </body>
