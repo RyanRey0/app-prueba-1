@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cotizador Corp Qualitas</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="imgs/OIG3_SF.ico">
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -17,7 +18,7 @@
             background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -41,6 +42,16 @@
             }
         }
 
+        @media (min-aspect-ratio: 16/9) {
+            .form-grid {
+                grid-template-columns: 2fr 2fr 3fr;
+            }
+            .cotizacion {
+                grid-column: 3;
+                grid-row: 1 / span 2;
+            }
+        }
+
         .form-group {
             margin-bottom: 15px;
         }
@@ -60,6 +71,9 @@
             font-size: 16px;
         }
 
+        input[type="text"] {
+            text-transform: uppercase;
+        }
 
         select {
             appearance: none;
@@ -73,12 +87,10 @@
             align-items: center;
         }
 
-
         .checkbox-group input[type="checkbox"] {
             width: auto;
             margin-right: 10px;
         }
-
 
         .cotizacion {
             background-color: #e0e0e0;
@@ -108,9 +120,14 @@
             border-radius: 4px;
             font-size: 16px;
             cursor: pointer;
-            width: 100%;
-            margin-top: 20px;
+            max-width: 300px;
             transition: background-color 0.3s;
+        }
+
+        @media (min-aspect-ratio: 16/9) {
+            button {
+                margin-left: auto;
+            }
         }
 
         button:hover {
@@ -157,11 +174,64 @@
             flex-grow: 1;
             border: none;
         }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress {
+            width: 0;
+            height: 100%;
+            background-color: #4CAF50;
+            border-radius: 10px;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #d4d4d4;
+            border-bottom: none;
+            border-top: none;
+            z-index: 99;
+            top: 100%;
+            left: 0;
+            right: 0;
+        }
+
+        .autocomplete-items div {
+            padding: 10px;
+            cursor: pointer;
+            background-color: #fff; 
+            border-bottom: 1px solid #d4d4d4; 
+        }
+
+        .autocomplete-items div:hover {
+            background-color: #e9e9e9; 
+        }
+
+        .autocomplete-active {
+            background-color: DodgerBlue !important; 
+            color: #ffffff; 
+        }
     </style>
 </head>
 <body>
     <div class="card">
         <h2 class="card-title">Cotizador Corp Qualitas</h2>
+        <div class="progress-bar" id="progressBarContainer">
+            <div class="progress" id="progressBar"></div>
+        </div>
+        <div class="progress-text" id="progressText"></div>
         <form id="cotizadorForm">
             <div class="form-grid">
                 <div>
@@ -201,15 +271,13 @@
                     </div>
                     <div class="form-group">
                         <label for="marca">MARCA</label>
-                        <select id="marca" name="marca" required>
-                            <option value="">Seleccione marca</option>
-                        </select>
+                        <input type="text" id="marca" name="marca" list="marcaList" autocomplete="off" required>
+                        <datalist id="marcaList"></datalist>
                     </div>
                     <div class="form-group">
                         <label for="modelo">MODELO</label>
-                        <select id="modelo" name="modelo" required>
-                            <option value="">Seleccione modelo</option>
-                        </select>
+                        <input type="text" id="modelo" name="modelo" list="modeloList" autocomplete="off" required>
+                        <datalist id="modeloList"></datalist>
                     </div>
                     <div class="form-group">
                         <label for="ano">AÑO</label>
@@ -226,25 +294,25 @@
                         <input type="text" id="sumaAsegurada" name="sumaAsegurada" placeholder="Ingrese la suma asegurada (ej: 10,000.00)" required>
                     </div>
                 </div>
-            </div>
-            <div class="cotizacion">
-                <h3>Cotización</h3>
-                <div class="cotizacion-grid">
-                    <div class="form-group">
-                        <label for="riesgo">RIESGO</label>
-                        <input type="text" id="riesgo" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="tasaNeta">TASA NETA</label>
-                        <input type="text" id="tasaNeta" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="primaNeta">PRIMA NETA</label>
-                        <input type="text" id="primaNeta" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label for="primaTotal">PRIMA TOTAL</label>
-                        <input type="text" id="primaTotal" readonly>
+                <div class="cotizacion">
+                    <h3>Cotización</h3>
+                    <div class="cotizacion-grid">
+                        <div class="form-group">
+                            <label for="riesgo">RIESGO</label>
+                            <input type="text" id="riesgo" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="tasaNeta">TASA NETA</label>
+                            <input type="text" id="tasaNeta" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="primaNeta">PRIMA NETA</label>
+                            <input type="text" id="primaNeta" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="primaTotal">PRIMA TOTAL</label>
+                            <input type="text" id="primaTotal" readonly>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -311,27 +379,44 @@
 
         // Función para cargar todos los datos
         async function loadData() {
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const progressBarContainer = document.getElementById('progressBarContainer');
+
             try {
-                const [vehiculosCsv, tasasLimaCsv, tasasProvinciaCsv] = await Promise.all([
-                    fetchData(vehiculosDataUrl),
-                    fetchData(tasasLimaDataUrl),
-                    fetchData(tasasProvinciaDataUrl)
-                ]);
+                progressText.textContent = 'Descargando datos de vehículos...';
+                const vehiculosCsv = await fetchData(vehiculosDataUrl);
+                progressBar.style.width = '33%';
+
+                progressText.textContent = 'Descargando tasas de Lima...';
+                const tasasLimaCsv = await fetchData(tasasLimaDataUrl);
+                progressBar.style.width = '66%';
+
+                progressText.textContent = 'Descargando tasas de Provincia...';
+                const tasasProvinciaCsv = await fetchData(tasasProvinciaDataUrl);
+                progressBar.style.width = '100%';
 
                 vehiculosData = parseCsv(vehiculosCsv);
                 tasasLimaData = parseTasasCsv(tasasLimaCsv);
                 tasasProvinciaData = parseTasasCsv(tasasProvinciaCsv);
 
+                progressText.textContent = 'Datos cargados correctamente';
+                setTimeout(() => {
+                    progressBarContainer.style.display = 'none';
+                    progressText.style.display = 'none';
+                }, 1000);
+
                 // Inicializar la aplicación después de cargar los datos
                 init();
             } catch (error) {
                 console.error('Error al cargar los datos:', error);
+                progressText.textContent = 'Error al cargar los datos. Por favor, recargue la página.';
                 alert('Hubo un problema al cargar los datos. Por favor, intente nuevamente más tarde.');
             }
         }
 
         // Llamar a loadData al cargar la página
-        loadData();
+        window.addEventListener('load', loadData);
 
         // Elementos del DOM
         const form = document.getElementById('cotizadorForm');
@@ -339,8 +424,8 @@
         const dniRucInput = document.getElementById('dni_ruc');
         const placaInput = document.getElementById('placa');
         const placaEnTramiteCheckbox = document.getElementById('placaEnTramite');
-        const marcaSelect = document.getElementById('marca');
-        const modeloSelect = document.getElementById('modelo');
+        const marcaInput = document.getElementById('marca');
+        const modeloInput = document.getElementById('modelo');
         const anoSelect = document.getElementById('ano');
         const sumaAseguradaInput = document.getElementById('sumaAsegurada');
         const autoDealerCheckbox = document.getElementById('autoDealer');
@@ -351,19 +436,41 @@
 
         // Inicialización
         function init() {
-            populateMarcas();
+            setupDatalist();
             populateYears();
             setupEventListeners();
         }
 
-        function populateMarcas() {
-            const uniqueMarcas = [...new Set(vehiculosData.map(v => v.MARCA))];
-            marcaSelect.innerHTML = '<option value="">Seleccione marca</option>';
-            uniqueMarcas.forEach(marca => {
+        function setupDatalist() {
+            const marcaList = document.getElementById('marcaList');
+            const modeloList = document.getElementById('modeloList');
+            
+            const marcas = [...new Set(vehiculosData.map(v => v.MARCA))];
+            marcas.forEach(marca => {
                 const option = document.createElement('option');
                 option.value = marca;
-                option.textContent = marca;
-                marcaSelect.appendChild(option);
+                marcaList.appendChild(option);
+            });
+
+            marcaInput.addEventListener('input', function() {
+                const selectedMarca = this.value;
+                const modelos = [...new Set(vehiculosData.filter(v => v.MARCA === selectedMarca).map(v => v.MODELO))];
+                
+                modeloList.innerHTML = '';
+                modelos.forEach(modelo => {
+                    const option = document.createElement('option');
+                    option.value = modelo;
+                    modeloList.appendChild(option);
+                });
+            });
+
+            modeloInput.addEventListener('input', function() {
+                const selectedMarca = marcaInput.value;
+                const selectedModelo = this.value;
+                const vehiculo = vehiculosData.find(v => v.MARCA === selectedMarca && v.MODELO === selectedModelo);
+                if (vehiculo) {
+                    riesgoInput.value = vehiculo.RIESGO;
+                }
             });
         }
 
@@ -384,8 +491,7 @@
             dniRucInput.addEventListener('blur', handleDniRucBlur);
             placaInput.addEventListener('blur', handlePlacaBlur);
             placaEnTramiteCheckbox.addEventListener('change', handlePlacaEnTramiteChange);
-            marcaSelect.addEventListener('change', handleMarcaChange);
-            modeloSelect.addEventListener('change', handleModeloChange);
+            anoSelect.addEventListener('change', handleAnoChange);
             sumaAseguradaInput.addEventListener('blur', handleSumaAseguradaBlur);
             form.addEventListener('submit', handleSubmit);
             form.addEventListener('input', calcularCotizacion);
@@ -433,24 +539,11 @@
             }
         }
 
-        function handleMarcaChange() {
-            modeloSelect.innerHTML = '<option value="">Seleccione modelo</option>';
-            const selectedMarca = marcaSelect.value;
-            const modelosFiltrados = vehiculosData.filter(v => v.MARCA === selectedMarca);
-            modelosFiltrados.forEach(v => {
-                const option = document.createElement('option');
-                option.value = v.MODELO;
-                option.textContent = v.MODELO;
-                modeloSelect.appendChild(option);
-            });
-        }
-
-        function handleModeloChange() {
-            const selectedMarca = marcaSelect.value;
-            const selectedModelo = modeloSelect.value;
-            const vehiculo = vehiculosData.find(v => v.MARCA === selectedMarca && v.MODELO === selectedModelo);
-            if (vehiculo) {
-                riesgoInput.value = vehiculo.RIESGO;
+        function handleAnoChange() {
+            const currentYear = new Date().getFullYear();
+            const selectedYear = parseInt(anoSelect.value);
+            if (currentYear - selectedYear < 5) {
+                autoDealerCheckbox.checked = true;
             }
         }
 
@@ -500,8 +593,8 @@
                     dni_ruc: document.getElementById('dni_ruc').value,
                     circulacion: document.getElementById('circulacion').value,
                     placa: document.getElementById('placa').value,
-                    marca: marcaSelect.value,
-                    modelo: modeloSelect.value,
+                    marca: marcaInput.value,
+                    modelo: modeloInput.value,
                     ano: anoSelect.value,
                     sumaAsegurada: parseFloat(sumaAseguradaInput.value.replace(/,/g, '')),
                 };
