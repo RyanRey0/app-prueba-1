@@ -340,10 +340,14 @@
         const vehiculosDataUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQI6kmRoIxEde-RHfZ1U0AfGC2ZubjeF-4BHbyw9Wx74ob3FFwcM3OV29X1HopLX_ncAnCAEMg3G7IQ/pub?gid=1008793461&single=true&output=csv';
         const tasasLimaDataUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSM9S_j_BZW6QnxB03uNMcbtJak39CPZ2tZKRHDehiqBFr7b6jNJdrSQ3UqpRzor5cfuMCMgDwAJ-1h/pub?gid=1732458939&single=true&output=csv';
         const tasasProvinciaDataUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSM9S_j_BZW6QnxB03uNMcbtJak39CPZ2tZKRHDehiqBFr7b6jNJdrSQ3UqpRzor5cfuMCMgDwAJ-1h/pub?gid=2015943443&single=true&output=csv';
+        const pnmDataUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSM9S_j_BZW6QnxB03uNMcbtJak39CPZ2tZKRHDehiqBFr7b6jNJdrSQ3UqpRzor5cfuMCMgDwAJ-1h/pub?gid=2042503507&single=true&output=csv';
+        const clasificacionRiesgoDataUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSM9S_j_BZW6QnxB03uNMcbtJak39CPZ2tZKRHDehiqBFr7b6jNJdrSQ3UqpRzor5cfuMCMgDwAJ-1h/pub?gid=540489781&single=true&output=csv';
 
         let vehiculosData = [];
         let tasasLimaData = {};
         let tasasProvinciaData = {};
+        let pnmData = {};
+        let clasificacionRiesgoData = [];
 
         // Función para cargar los datos desde las URLs
         async function fetchData(url) {
@@ -379,16 +383,34 @@
 
             lines.slice(1).forEach(line => {
                 const cells = line.split(',');
-                const ant = cells[0].trim();
+                const ant = cells[0]?.trim();
                 tasas[ant] = {
-                    'CATEGORIA I': parseFloat(cells[1].trim().replace('%', '').replace(',', '.')) || 0,
-                    'MEDIANO RIESGO': parseFloat(cells[2].trim().replace('%', '').replace(',', '.')) || 0,
-                    'ALTO RIESGO': parseFloat(cells[3].trim().replace('%', '').replace(',', '.')) || 0,
-                    'CHINO E INDIO': parseFloat(cells[4].trim().replace('%', '').replace(',', '.')) || 0
+                    'CATEGORIA I': parseFloat(cells[1]?.trim().replace('%', '').replace(',', '.')) || 0,
+                    'MEDIANO RIESGO': parseFloat(cells[2]?.trim().replace('%', '').replace(',', '.')) || 0,
+                    'ALTO RIESGO': parseFloat(cells[3]?.trim().replace('%', '').replace(',', '.')) || 0,
+                    'CHINO E INDIO': parseFloat(cells[4]?.trim().replace('%', '').replace(',', '.')) || 0
                 };
             });
 
             return tasas;
+        }
+        // Función para parsear la tabla CSV de prima neta mínima
+        function parsePnmCsv(csv) {
+            const lines = csv.split('\n');
+            const pnm = {};
+
+            lines.slice(1).forEach(line => {
+                const cells = line.split(',');
+                const ubicacion = cells[0]?.trim();
+                pnm[ubicacion] = {
+                    'CATEGORIA I': parseFloat(cells[1]?.trim().replace(',', '.')),
+                    'MEDIANO RIESGO': parseFloat(cells[2]?.trim().replace(',', '.')),
+                    'ALTO RIESGO': parseFloat(cells[3]?.trim().replace(',', '.')),
+                    'CHINO E INDIO': parseFloat(cells[4]?.trim().replace(',', '.'))
+                };
+            });
+
+            return pnm;
         }
 
         // Función para cargar todos los datos
@@ -400,19 +422,29 @@
             try {
                 progressText.textContent = 'Descargando datos de vehículos...';
                 const vehiculosCsv = await fetchData(vehiculosDataUrl);
-                progressBar.style.width = '33%';
+                progressBar.style.width = '16%';
 
                 progressText.textContent = 'Descargando tasas de Lima...';
                 const tasasLimaCsv = await fetchData(tasasLimaDataUrl);
-                progressBar.style.width = '66%';
+                progressBar.style.width = '32%';
 
                 progressText.textContent = 'Descargando tasas de Provincia...';
                 const tasasProvinciaCsv = await fetchData(tasasProvinciaDataUrl);
+                progressBar.style.width = '48%';
+
+                progressText.textContent = 'Descargando prima neta mínima...';
+                const pnmCsv = await fetchData(pnmDataUrl);
+                progressBar.style.width = '80%';
+
+                progressText.textContent = 'Descargando clasificación de riesgo...';
+                const clasificacionRiesgoCsv = await fetchData(clasificacionRiesgoDataUrl);
                 progressBar.style.width = '100%';
 
                 vehiculosData = parseCsv(vehiculosCsv);
                 tasasLimaData = parseTasasCsv(tasasLimaCsv);
                 tasasProvinciaData = parseTasasCsv(tasasProvinciaCsv);
+                pnmData = parsePnmCsv(pnmCsv);
+                clasificacionRiesgoData = parseCsv(clasificacionRiesgoCsv);
 
                 progressText.textContent = 'Datos cargados correctamente';
                 setTimeout(() => {
@@ -587,8 +619,13 @@
             }
             
             const tasaNeta = tasasData[antiguedad][riesgo];
-            let primaNeta = tasaNeta * sumaAsegurada / 100;
-            primaNeta = Math.max(primaNeta, 300);
+            let primaNeta = (tasaNeta * sumaAsegurada) / 100;
+            
+            // Obtener la prima neta mínima según la ubicación y el riesgo
+            const primaNetaMinima = pnmData[circulacion][riesgo];
+            // Asegurarse de que la prima neta no sea menor que la prima neta mínima
+            primaNeta = Math.max(primaNeta, primaNetaMinima);
+            
             if (autoDealerCheckbox.checked) {
                 primaNeta += 90;
             }
