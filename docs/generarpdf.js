@@ -304,7 +304,7 @@ export async function generarPDF(formData, cotizacion, autoDealer) {
 
         addSectionBold('Detalles de la Cotización',true);
         addRow('SUMA ASEGURADA', formData.sumaAsegurada.toLocaleString('es-PE', { style: 'currency', currency: 'USD' }));
-        addRow('AUTOALDEALER', autoDealer ? '$90.00' : '-');
+        addRow('AUTOALDEALER', autoDealer ? 90.00.toLocaleString('es-PE', { style: 'currency', currency: 'USD' }) : '-');
         addRow('PRIMA NETA', cotizacion.primaNeta.toLocaleString('es-PE', { style: 'currency', currency: 'USD' }));
         addRow('PRIMA TOTAL', cotizacion.primaTotal.toLocaleString('es-PE', { style: 'currency', currency: 'USD' }));
 
