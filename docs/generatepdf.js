@@ -1,36 +1,37 @@
-import { jsPDF } from "jspdf";
-import autoTable from "jspdf-autotable"; // Importar la extensión de autoTable
+export async function generar_pdf(formData, cotizacion, autoDealer) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
 
-export async function generatePDF(formData, cotizacion, autoDealer) {
-  const today = new Date();
-  const formattedDate = `${today.getFullYear()}${(today.getMonth() + 1).toString().padStart(2, '0')}${today.getDate().toString().padStart(2, '0')}${today.getHours().toString().padStart(2, '0')}${today.getMinutes().toString().padStart(2, '0')}`;
-  const fileName = `Qualitas_Corp_${formattedDate}_${formData.placa}_${formData.contratante.replace(/[./\s]+/g, "")}`;
+  // Generar nombre del archivo
+  const now = new Date();
+  const timestamp = now.getFullYear().toString().substr(-2) +
+                    (now.getMonth() + 1).toString().padStart(2, '0') +
+                    now.getDate().toString().padStart(2, '0') +
+                    now.getHours().toString().padStart(2, '0') +
+                    now.getMinutes().toString().padStart(2, '0');
+  const placa = formData.placa.replace(/[^a-zA-Z0-9]/g, '');
+  const cliente = formData.contratante.replace(/[./()\s]+$/, '').replace(/[./()]/g, '');
+  const fileName = `Qualitas Corp ${timestamp} ${placa} ${cliente}.pdf`;
 
-  // Calcular la prima neta y total considerando la opción de Auto al Dealer
-  let primaNeta = cotizacion.primaNeta;
-  if (autoDealer) {
-    primaNeta += 90; // Añadir el costo de auto al dealer si se selecciona
-  }
-  const primaTotal = primaNeta * 1.03 * 1.18;
+  // Generar el PDF y obtener la URL
+  const pdfBlob = doc.output('blob');
+  const pdfUrl = URL.createObjectURL(pdfBlob);
 
-  // Generate the PDF using jsPDF
-  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  return pdfBlob;
+}
 
-  // Add header to the document
   doc.setFontSize(16);
   doc.setTextColor("#333333");
   doc.text('SLIP DE COTIZACIÓN - QUALITAS CORP', 40, 40);
   doc.setLineWidth(0.5);
   doc.line(40, 50, 555, 50);
 
-  // Adding date and number of the quotation
   doc.setFontSize(12);
   doc.text(`Fecha de Cotización: ${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`, 40, 70);
   doc.text(`Número de Cotización: ${formattedDate}`, 40, 90);
 
-  // Información general - Tabla en formato vertical
-  doc.setFontSize(12);
   let currentY = 120;
+  doc.setFontSize(12);
   doc.text('Información General:', 40, currentY);
   currentY += 20;
 
@@ -51,7 +52,6 @@ export async function generatePDF(formData, cotizacion, autoDealer) {
 
   currentY = doc.lastAutoTable.finalY + 20;
 
-  // Información del vehículo - Tabla horizontal
   doc.setFontSize(12);
   doc.text('Información del Vehículo:', 40, currentY);
   currentY += 20;
@@ -67,7 +67,6 @@ export async function generatePDF(formData, cotizacion, autoDealer) {
 
   currentY = doc.lastAutoTable.finalY + 20;
 
-  // Resumen de primas - Mantener el orden existente
   doc.setFontSize(12);
   doc.text('Resumen de Primas:', 40, currentY);
   currentY += 20;
@@ -77,9 +76,9 @@ export async function generatePDF(formData, cotizacion, autoDealer) {
     head: [['PRIMA NETA', 'AUTO AL DEALER', 'PRIMA TOTAL']],
     body: [
       [
-        `${primaNeta.toFixed(2)}`,
+        `${cotizacion.primaNeta.toFixed(2)}`,
         autoDealer ? '90.00' : 'No Aplica',
-        `${primaTotal.toFixed(2)}`,
+        `${cotizacion.primaTotal.toFixed(2)}`,
       ]
     ],
     theme: 'grid',
@@ -89,7 +88,6 @@ export async function generatePDF(formData, cotizacion, autoDealer) {
 
   currentY = doc.lastAutoTable.finalY + 30;
 
-  // Materia del Seguro
   doc.setFontSize(12);
   doc.text('MATERIA DEL SEGURO', 40, currentY);
   currentY += 20;
@@ -98,7 +96,6 @@ export async function generatePDF(formData, cotizacion, autoDealer) {
 
   currentY += 40;
 
-  // Coberturas - Tabla
   doc.setFontSize(12);
   doc.text('Coberturas:', 40, currentY);
   currentY += 20;

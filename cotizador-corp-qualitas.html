@@ -21,6 +21,20 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            position: relative;
+        }
+
+        .header-images {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-images img {
+            max-height: 50px;
+            margin-left: 10px;
         }
 
         .card-title {
@@ -28,6 +42,8 @@
             font-weight: 500;
             margin-bottom: 20px;
             color: #333;
+            text-align: center;
+            padding-top: 60px;
         }
 
         .form-grid {
@@ -120,14 +136,7 @@
             border-radius: 4px;
             font-size: 16px;
             cursor: pointer;
-            max-width: 300px;
             transition: background-color 0.3s;
-        }
-
-        @media (min-aspect-ratio: 16/9) {
-            button {
-                margin-left: auto;
-            }
         }
 
         button:hover {
@@ -149,12 +158,8 @@
 
         .button-container {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             margin-top: 20px;
-        }
-
-        .button-container button {
-            width: calc(50% - 10px);
         }
 
         .modal-content {
@@ -227,6 +232,10 @@
 </head>
 <body>
     <div class="card">
+        <div class="header-images">
+            <img src="imgs/LGFE_DOC.png" alt="LGFE_DOC">
+            <img src="imgs/LQUE_DOC.png" alt="LQUE_DOC">
+        </div>
         <h2 class="card-title">Cotizador Corp Qualitas</h2>
         <div class="progress-bar" id="progressBarContainer">
             <div class="progress" id="progressBar"></div>
@@ -316,12 +325,17 @@
                     </div>
                 </div>
             </div>
-            <button type="submit">COTIZAR</button>
+            <div class="button-container">
+                <button type="submit">COTIZAR</button>
+            </div>
         </form>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script type="module">
+        import { generarPDF } from './docs/generarpdf.js';
+
         // URLs de los datos
         const vehiculosDataUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQI6kmRoIxEde-RHfZ1U0AfGC2ZubjeF-4BHbyw9Wx74ob3FFwcM3OV29X1HopLX_ncAnCAEMg3G7IQ/pub?gid=1008793461&single=true&output=csv';
         const tasasLimaDataUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSM9S_j_BZW6QnxB03uNMcbtJak39CPZ2tZKRHDehiqBFr7b6jNJdrSQ3UqpRzor5cfuMCMgDwAJ-1h/pub?gid=1732458939&single=true&output=csv';
@@ -599,7 +613,6 @@
                     sumaAsegurada: parseFloat(sumaAseguradaInput.value.replace(/,/g, '')),
                 };
 
-
                 const cotizacion = {
                     primaNeta: parseFloat(primaNetaInput.value.replace(/,/g, '')),
                     primaTotal: parseFloat(primaTotalInput.value.replace(/,/g, '')),
@@ -607,121 +620,89 @@
 
                 const autoDealer = autoDealerCheckbox.checked;
 
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
+                const pdfBlob = await generarPDF(formData, cotizacion, autoDealer);
+                // Verificar si pdfBlob es un objeto válido
+                if (pdfBlob && pdfBlob.blob instanceof Blob) {
+                    // Crear un objeto URL para el blob
+                    const pdfUrl = URL.createObjectURL(pdfBlob.blob);
+                    
+                    // Crear un modal para previsualización
+                    const modal = document.createElement('div');
+                    modal.style.position = 'fixed';
+                    modal.style.top = '0';
+                    modal.style.left = '0';
+                    modal.style.width = '100%';
+                    modal.style.height = '100%';
+                    modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                    modal.style.display = 'flex';
+                    modal.style.justifyContent = 'center';
+                    modal.style.alignItems = 'center';
+                    modal.style.zIndex = '1000';
 
-                // Generar nombre del archivo
-                const now = new Date();
-                const timestamp = now.getFullYear().toString().substr(-2) +
-                                  (now.getMonth() + 1).toString().padStart(2, '0') +
-                                  now.getDate().toString().padStart(2, '0') +
-                                  now.getHours().toString().padStart(2, '0') +
-                                  now.getMinutes().toString().padStart(2, '0');
-                const placa = formData.placa.replace(/[^a-zA-Z0-9]/g, '');
-                const cliente = formData.contratante.replace(/[./()\s]+$/, '').replace(/[./()]/g, '');
-                const fileName = `Qualitas Corp ${timestamp} ${placa} ${cliente}.pdf`;
+                    const modalContent = document.createElement('div');
+                    modalContent.style.backgroundColor = 'white';
+                    modalContent.style.borderRadius = '10px';
+                    modalContent.style.overflow = 'hidden';
+                    modalContent.style.width = '80%';
+                    modalContent.style.height = '80%';
+                    modalContent.style.display = 'flex';
+                    modalContent.style.flexDirection = 'column';
 
-                // Crear tabla básica
-                doc.setFontSize(18);
-                doc.text('SLIP DE COTIZACIÓN - QUALITAS CORP', 20, 20);
-                doc.setFontSize(12);
-                doc.setLineWidth(0.1);
-                
-                let y = 40;
-                const addRow = (label, value) => {
-                    doc.line(20, y, 190, y);
-                    doc.text(label, 25, y + 10);
-                    doc.text(value, 100, y + 10);
-                    y += 15;
-                };
+                    const buttonContainer = document.createElement('div');
+                    buttonContainer.style.padding = '10px';
+                    buttonContainer.style.display = 'flex';
+                    buttonContainer.style.justifyContent = 'flex-end';
+                    buttonContainer.style.gap = '10px';
 
+                    const closeButton = document.createElement('button');
+                    closeButton.textContent = 'Cerrar';
+                    closeButton.style.padding = '10px 20px';
+                    closeButton.style.fontSize = '16px';
+                    closeButton.onclick = () => {
+                        modal.remove();
+                        URL.revokeObjectURL(pdfUrl);
+                    };
 
-                addRow('Contratante:', formData.contratante);
-                addRow('DNI/RUC:', formData.dni_ruc);
-                addRow('Placa:', formData.placa);
-                addRow('Marca:', formData.marca);
-                addRow('Modelo:', formData.modelo);
-                addRow('Año:', formData.ano);
-                addRow('Suma Asegurada:', `${formData.sumaAsegurada.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
-                addRow('Prima Total:', `${cotizacion.primaTotal.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+                    const downloadButton = document.createElement('button');
+                    downloadButton.textContent = 'Descargar';
+                    downloadButton.style.padding = '10px 20px';
+                    downloadButton.style.fontSize = '16px';
+                    downloadButton.onclick = () => {
+                        const link = document.createElement('a');
+                        link.href = pdfUrl;
+                        link.download = pdfBlob.fileName || 'cotizacion.pdf';
+                        link.click();
+                    };
 
-                doc.line(20, y, 190, y);
+                    buttonContainer.appendChild(closeButton);
+                    buttonContainer.appendChild(downloadButton);
 
-                // Generar el PDF y obtener la URL
-                const pdfBlob = doc.output('blob');
-                const pdfUrl = URL.createObjectURL(pdfBlob);
+                    const iframe = document.createElement('iframe');
+                    iframe.src = pdfUrl;
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.border = 'none';
 
-                // Crear un modal para previsualización
-                const modal = document.createElement('div');
-                modal.style.position = 'fixed';
-                modal.style.top = '0';
-                modal.style.left = '0';
-                modal.style.width = '100%';
-                modal.style.height = '100%';
-                modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
-                modal.style.display = 'flex';
-                modal.style.justifyContent = 'center';
-                modal.style.alignItems = 'center';
-                modal.style.zIndex = '1000';
-
-                const modalContent = document.createElement('div');
-                modalContent.className = 'modal-content';
-                modalContent.style.backgroundColor = 'white';
-                modalContent.style.borderRadius = '10px';
-                modalContent.style.overflow = 'hidden';
-                modalContent.style.width = '80%';
-                modalContent.style.height = '80%';
-                modalContent.style.display = 'flex';
-                modalContent.style.flexDirection = 'column';
-
-                const buttonContainer = document.createElement('div');
-                buttonContainer.className = 'modal-buttons';
-                buttonContainer.style.padding = '10px';
-                buttonContainer.style.display = 'flex';
-                buttonContainer.style.justifyContent = 'flex-end';
-                buttonContainer.style.gap = '10px';
-
-                const closeButton = document.createElement('button');
-                closeButton.textContent = 'Cerrar';
-                closeButton.style.padding = '5px 10px';
-                closeButton.onclick = () => {
-                    modal.remove();
-                    URL.revokeObjectURL(pdfUrl);
-                };
-
-                const downloadButton = document.createElement('button');
-                downloadButton.textContent = 'Descargar';
-                downloadButton.style.padding = '5px 10px';
-                downloadButton.onclick = () => {
-                    const link = document.createElement('a');
-                    link.href = pdfUrl;
-                    link.download = fileName;
-                    link.click();
-                };
-
-
-                buttonContainer.appendChild(closeButton);
-                buttonContainer.appendChild(downloadButton);
-
-                const iframe = document.createElement('iframe');
-                iframe.className = 'modal-iframe';
-                iframe.src = pdfUrl;
-                iframe.style.width = '100%';
-                iframe.style.height = '100%';
-                iframe.style.border = 'none';
-
-                modalContent.appendChild(buttonContainer);
-                modalContent.appendChild(iframe);
-                modal.appendChild(modalContent);
-                document.body.appendChild(modal);
-
-            } catch (error) {
-                console.error('Error:', error);
-                const errorElement = document.getElementById('error-message');
-                if (errorElement) {
-                    showError(errorElement, 'Hubo un error al generar el PDF. Por favor, inténtelo de nuevo.');
+                    modalContent.appendChild(buttonContainer);
+                    modalContent.appendChild(iframe);
+                    modal.appendChild(modalContent);
+                    document.body.appendChild(modal);
                 } else {
-                    console.error('Elemento de error no encontrado');
+                    throw new Error('El objeto PDF no es válido');
+                }
+            } catch (error) {
+                console.error('Error detallado:', error);
+                
+                const errorDetails = JSON.stringify(error, Object.getOwnPropertyNames(error), 2);
+                console.error('Detalles del error para copiar:', errorDetails);
+                
+                const errorMessage = `Se produjo un error al generar el PDF. Por favor, copie los detalles del error de la consola y contacte al soporte técnico.\n\nPara copiar los detalles, abra la consola del navegador (F12) y busque 'Detalles del error para copiar'.`;
+                
+                const errorElement = document.querySelector('.alert');
+                if (errorElement) {
+                    showError(errorElement, errorMessage);
+                } else {
+                    alert(errorMessage);
                 }
             }
         }
