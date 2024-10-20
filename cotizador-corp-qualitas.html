@@ -556,8 +556,10 @@
         function handleAnoChange() {
             const currentYear = new Date().getFullYear();
             const selectedYear = parseInt(anoSelect.value);
-            if (currentYear - selectedYear < 5) {
+            if (currentYear - selectedYear <= 5) {
                 autoDealerCheckbox.checked = true;
+            } else {
+                autoDealerCheckbox.checked = false;
             }
         }
 
