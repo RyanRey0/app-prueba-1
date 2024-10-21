@@ -58,7 +58,6 @@
         .header-images img {
             max-height: 60px;
             margin-left: 15px;
-            border-radius: 10px;
         }
 
         .card-title {
@@ -285,6 +284,152 @@
             background-color: var(--primary) !important;
             color: var(--white);
         }
+
+        .checkbox-wrapper-16 *,.checkbox-wrapper-16 *:after,.checkbox-wrapper-16 *:before {
+            box-sizing: border-box;
+        }
+        .checkbox-wrapper-16 .checkbox-input {
+            clip: rect(0 0 0 0);
+            -webkit-clip-path: inset(100%);
+            clip-path: inset(100%);
+            height: 1px;
+            overflow: hidden;
+            position: absolute;
+            white-space: nowrap;
+            width: 1px;
+        }
+        .checkbox-wrapper-16 .checkbox-input:checked + .checkbox-tile {
+            border-color: #4F46E5;
+            color: #4F46E5;
+            font-weight: bold;
+        }
+        .checkbox-wrapper-16 .checkbox-input:checked + .checkbox-tile .checkbox-label {
+            color: #4F46E5;
+        }
+        .checkbox-wrapper-16 .checkbox-input:checked + .checkbox-tile .checkbox-circle {
+            background-color: #4F46E5;
+            border-color: #4F46E5;
+        }
+        .checkbox-wrapper-16 .checkbox-input:focus + .checkbox-tile {
+            border-color: #4F46E5;
+        }
+        .checkbox-wrapper-16 .checkbox-tile {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 15rem;
+            min-height: 3rem;
+            border-radius: 1.5rem;
+            border: 2px solid #b5bfd9;
+            background-color: #fff;
+            transition: 0.15s ease;
+            cursor: pointer;
+            position: relative;
+            font-family: 'Helvetica', sans-serif;
+        }
+        .checkbox-wrapper-16 .checkbox-tile:hover {
+            border-color: #4F46E5;
+        }
+        .checkbox-wrapper-16 .checkbox-label {
+            color: #707070;
+            transition: 0.375s ease;
+            text-align: center;
+            font-family: 'Helvetica', sans-serif;
+            margin-right: 2rem;
+            margin-left: 2rem;
+        }
+        .checkbox-wrapper-16 .checkbox-circle {
+            display: block;
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid #b5bfd9;
+            background-color: #fff;
+            border-radius: 50%;
+            transition: 0.25s ease;
+        }
+
+        .checkbox-wrapper-46 input[type="checkbox"] {
+            display: none;
+            visibility: hidden;
+        }
+
+        .checkbox-wrapper-46 .cbx {
+            margin: auto;
+            -webkit-user-select: none;
+            user-select: none;
+            cursor: pointer;
+            font-family: 'Helvetica', sans-serif;
+        }
+        .checkbox-wrapper-46 .cbx span {
+            display: inline-block;
+            vertical-align: bottom;
+            transform: translate3d(0, 0, 0);
+        }
+
+        .checkbox-wrapper-46 .cbx span:first-child {
+            position: relative;
+            width: 18px;
+            height: 18px;
+            border-radius: 3px;
+            transform: scale(1);
+            vertical-align: bottom;
+            border: 1px solid #9098A9;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-wrapper-46 .cbx span:first-child svg {
+            position: absolute;
+            top: 3px;
+            left: 2px;
+            fill: none;
+            stroke: #FFFFFF;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 16px;
+            stroke-dashoffset: 16px;
+            transition: all 0.3s ease;
+            transition-delay: 0.1s;
+            transform: translate3d(0, 0, 0);
+        }
+
+        .checkbox-wrapper-46 .cbx span:first-child:before {
+            content: "";
+            width: 100%;
+            height: 100%;
+            background: #4F46E5;
+            display: block;
+            transform: scale(0);
+            opacity: 1;
+            border-radius: 50%;
+        }
+        .checkbox-wrapper-46 .cbx span:last-child {
+            padding-left: 8px;
+            padding-top: 16px;
+        }
+        .checkbox-wrapper-46 .cbx:hover span:first-child {
+            border-color: #4F46E5;
+        }
+
+        .checkbox-wrapper-46 .inp-cbx:checked + .cbx span:first-child {
+            background: #4F46E5;
+            border-color: #4F46E5;
+            animation: wave-46 0.4s ease;
+        }
+        .checkbox-wrapper-46 .inp-cbx:checked + .cbx span:first-child svg {
+            stroke-dashoffset: 0;
+        }
+        .checkbox-wrapper-46 .inp-cbx:checked + .cbx span:first-child:before {
+            transform: scale(3.5);
+            opacity: 0;
+            transition: all 0.6s ease;
+        }
+
+        @keyframes wave-46 {
+            50% {
+                transform: scale(0.9);
+            }
+        }
     </style>
 </head>
 <body>
@@ -315,49 +460,57 @@
                     </div>
                     <div class="form-group">
                         <label for="circulacion">CIRCULACIÓN</label>
-                        <select id="circulacion" name="circulacion" required>
-                            <option value="">Seleccione circulación</option>
-                            <option value="LIMA">LIMA</option>
-                            <option value="PROVINCIA">PROVINCIA</option>
-                        </select>
+                        <input type="text" id="circulacion" name="circulacion" list="circulacionList" autocomplete="on" required>
+                        <datalist id="circulacionList"></datalist>
                     </div>
                 </div>
                 <div>
-                    <div class="form-group">
-                        <label for="placa">PLACA</label>
-                        <input type="text" id="placa" name="placa" required>
-                        <div id="placaError" class="alert" style="display: none;">
-                            <div class="alert-title">Error</div>
-                            <div class="alert-description"></div>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="checkbox" id="placaEnTramite" name="placaEnTramite">
-                            <label for="placaEnTramite">Placa en trámite</label>
-                        </div>
+                <div class="form-group">
+                    <label for="placa">PLACA</label>
+                    <input type="text" id="placa" name="placa" required>
+                    <div id="placaError" class="alert" style="display: none;">
+                        <div class="alert-title">Error</div>
+                        <div class="alert-description"></div>
+                    </div>
+                    <div class="checkbox-wrapper-46">
+                        <input class="inp-cbx" id="placaEnTramite" name="placaEnTramite" type="checkbox" />
+                        <label class="cbx" for="placaEnTramite"><span>
+                            <svg width="12px" height="10px" viewbox="0 0 12 10">
+                            <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                            </svg></span><span>PLACA EN TRAMITE</span>
+                        </label>
+                    </div>
                     </div>
                     <div class="form-group">
                         <label for="marca">MARCA</label>
-                        <input type="text" id="marca" name="marca" list="marcaList" autocomplete="off" required>
+                        <input type="text" id="marca" name="marca" list="marcaList" autocomplete="on" required>
                         <datalist id="marcaList"></datalist>
                     </div>
                     <div class="form-group">
                         <label for="modelo">MODELO</label>
-                        <input type="text" id="modelo" name="modelo" list="modeloList" autocomplete="off" required>
+                        <input type="text" id="modelo" name="modelo" list="modeloList" autocomplete="on" required>
                         <datalist id="modeloList"></datalist>
                     </div>
                     <div class="form-group">
                         <label for="ano">AÑO</label>
-                        <select id="ano" name="ano" required>
-                            <option value="">Seleccione año</option>
-                        </select>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="autoDealer" name="autoDealer">
-                        <label for="autoDealer">Auto al Dealer</label>
+                        <input type="text" id="ano" name="ano" required>
+                        <div id="anoError" class="alert" style="display: none;">
+                            <div class="alert-title">Error</div>
+                            <div class="alert-description"></div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="sumaAsegurada">SUMA ASEGURADA</label>
                         <input type="text" id="sumaAsegurada" name="sumaAsegurada" placeholder="10,000.00" required>
+                    </div>
+                    <div class="checkbox-wrapper-16">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" class="checkbox-input" id="autoDealer" name="autoDealer">
+                            <span class="checkbox-tile">
+                                <span class="checkbox-label">AUTO AL DEALER</span>
+                                <span class="checkbox-circle"></span>
+                            </span>
+                        </label>
                     </div>
                 </div>
                 <div class="cotizacion">
@@ -387,7 +540,6 @@
             </div>
         </form>
     </div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script type="module">
@@ -399,12 +551,14 @@
         const tasasProvinciaDataUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSM9S_j_BZW6QnxB03uNMcbtJak39CPZ2tZKRHDehiqBFr7b6jNJdrSQ3UqpRzor5cfuMCMgDwAJ-1h/pub?gid=2015943443&single=true&output=csv';
         const pnmDataUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSM9S_j_BZW6QnxB03uNMcbtJak39CPZ2tZKRHDehiqBFr7b6jNJdrSQ3UqpRzor5cfuMCMgDwAJ-1h/pub?gid=2042503507&single=true&output=csv';
         const clasificacionRiesgoDataUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSM9S_j_BZW6QnxB03uNMcbtJak39CPZ2tZKRHDehiqBFr7b6jNJdrSQ3UqpRzor5cfuMCMgDwAJ-1h/pub?gid=540489781&single=true&output=csv';
+        const zonasDataUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTGi2gtZKDKyH7g7-S1WUCy5vxdofq9G-u72X2vvP-ZinsPtiOkwpVQ23nsQKgeRw/pub?gid=115021740&single=true&output=csv';
 
         let vehiculosData = [];
         let tasasLimaData = {};
         let tasasProvinciaData = {};
         let pnmData = {};
         let clasificacionRiesgoData = [];
+        let zonasData = [];
 
         // Función para cargar los datos desde las URLs
         async function fetchData(url) {
@@ -479,22 +633,26 @@
             try {
                 progressText.textContent = 'Descargando datos de vehículos...';
                 const vehiculosCsv = await fetchData(vehiculosDataUrl);
-                progressBar.style.width = '16%';
+                progressBar.style.width = '14%';
 
                 progressText.textContent = 'Descargando tasas de Lima...';
                 const tasasLimaCsv = await fetchData(tasasLimaDataUrl);
-                progressBar.style.width = '32%';
+                progressBar.style.width = '28%';
 
                 progressText.textContent = 'Descargando tasas de Provincia...';
                 const tasasProvinciaCsv = await fetchData(tasasProvinciaDataUrl);
-                progressBar.style.width = '48%';
+                progressBar.style.width = '42%';
 
                 progressText.textContent = 'Descargando prima neta mínima...';
                 const pnmCsv = await fetchData(pnmDataUrl);
-                progressBar.style.width = '80%';
+                progressBar.style.width = '56%';
 
                 progressText.textContent = 'Descargando clasificación de riesgo...';
                 const clasificacionRiesgoCsv = await fetchData(clasificacionRiesgoDataUrl);
+                progressBar.style.width = '70%';
+
+                progressText.textContent = 'Descargando datos de zonas...';
+                const zonasCsv = await fetchData(zonasDataUrl);
                 progressBar.style.width = '100%';
 
                 vehiculosData = parseCsv(vehiculosCsv);
@@ -502,6 +660,7 @@
                 tasasProvinciaData = parseTasasCsv(tasasProvinciaCsv);
                 pnmData = parsePnmCsv(pnmCsv);
                 clasificacionRiesgoData = parseCsv(clasificacionRiesgoCsv);
+                zonasData = parseCsv(zonasCsv);
 
                 progressText.textContent = 'Datos cargados correctamente';
                 setTimeout(() => {
@@ -529,13 +688,16 @@
         const placaEnTramiteCheckbox = document.getElementById('placaEnTramite');
         const marcaInput = document.getElementById('marca');
         const modeloInput = document.getElementById('modelo');
-        const anoSelect = document.getElementById('ano');
+        const anoInput = document.getElementById('ano');
         const sumaAseguradaInput = document.getElementById('sumaAsegurada');
         const autoDealerCheckbox = document.getElementById('autoDealer');
         const riesgoInput = document.getElementById('riesgo');
         const tasaNetaInput = document.getElementById('tasaNeta');
         const primaNetaInput = document.getElementById('primaNeta');
         const primaTotalInput = document.getElementById('primaTotal');
+        const circulacionInput = document.getElementById('circulacion');
+
+        let zonaSeleccionada = '';
 
         // Inicialización
         function init() {
@@ -547,6 +709,7 @@
         function setupDatalist() {
             const marcaList = document.getElementById('marcaList');
             const modeloList = document.getElementById('modeloList');
+            const circulacionList = document.getElementById('circulacionList');
             
             const marcas = [...new Set(vehiculosData.map(v => v.MARCA))];
             marcas.forEach(marca => {
@@ -565,6 +728,7 @@
                     option.value = modelo;
                     modeloList.appendChild(option);
                 });
+                calcularCotizacion();
             });
 
             modeloInput.addEventListener('input', function() {
@@ -574,19 +738,30 @@
                 if (vehiculo) {
                     riesgoInput.value = vehiculo.RIESGO;
                 }
+                calcularCotizacion();
+            });
+
+            const departamentos = [...new Set(zonasData.map(z => z.DEPARTAMENTO))];
+            departamentos.forEach(departamento => {
+                const option = document.createElement('option');
+                option.value = departamento;
+                circulacionList.appendChild(option);
+            });
+
+            circulacionInput.addEventListener('input', function() {
+                const selectedDepartamento = this.value;
+                const zona = zonasData.find(z => z.DEPARTAMENTO === selectedDepartamento);
+                if (zona) {
+                    zonaSeleccionada = zona.ZONA;
+                }
+                calcularCotizacion();
             });
         }
 
         function populateYears() {
             const currentYear = new Date().getFullYear();
-            anoSelect.innerHTML = '<option value="">Seleccione año</option>';
-            for (let i = 0; i <= 50; i++) {
-                const year = currentYear - i;
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = year;
-                anoSelect.appendChild(option);
-            }
+            anoInput.setAttribute('min', currentYear - 50);
+            anoInput.setAttribute('max', currentYear);
         }
 
         function setupEventListeners() {
@@ -594,10 +769,16 @@
             dniRucInput.addEventListener('blur', handleDniRucBlur);
             placaInput.addEventListener('blur', handlePlacaBlur);
             placaEnTramiteCheckbox.addEventListener('change', handlePlacaEnTramiteChange);
-            anoSelect.addEventListener('change', handleAnoChange);
+            anoInput.addEventListener('blur', handleAnoBlur);
             sumaAseguradaInput.addEventListener('blur', handleSumaAseguradaBlur);
             form.addEventListener('submit', handleSubmit);
             form.addEventListener('input', calcularCotizacion);
+            marcaInput.addEventListener('input', calcularCotizacion);
+            modeloInput.addEventListener('input', calcularCotizacion);
+            anoInput.addEventListener('input', calcularCotizacion);
+            sumaAseguradaInput.addEventListener('input', calcularCotizacion);
+            autoDealerCheckbox.addEventListener('change', calcularCotizacion);
+            circulacionInput.addEventListener('input', calcularCotizacion);
         }
 
         function handleContratanteInput(e) {
@@ -631,6 +812,7 @@
             }
 
             placaInput.value = newValue;
+            calcularCotizacion();
         }
 
         function handlePlacaEnTramiteChange() {
@@ -640,14 +822,33 @@
             } else {
                 placaInput.value = '';
             }
+            calcularCotizacion();
+        }
+
+        function handleAnoBlur() {
+            const currentYear = new Date().getFullYear();
+            const value = anoInput.value.replace(/\D/g, '');
+            const errorElement = document.getElementById('anoError');
+
+            if (value.length !== 4 || isNaN(value) || value < currentYear - 50 || value > currentYear) {
+                showError(errorElement, 'AÑO debe ser un número de 4 dígitos entre ' + (currentYear - 50) + ' y ' + currentYear);
+            } else {
+                hideError(errorElement);
+                anoInput.value = value;
+            }
+            calcularCotizacion();
+            handleAnoChange();
         }
 
         function handleAnoChange() {
             const currentYear = new Date().getFullYear();
-            const selectedYear = parseInt(anoSelect.value);
-            if (currentYear - selectedYear < 5) {
-                autoDealerCheckbox.checked = true;
+            const selectedYear = parseInt(anoInput.value);
+            if (currentYear - selectedYear <= 5) {
+                document.getElementById('autoDealer').checked = true;
+            } else {
+                document.getElementById('autoDealer').checked = false;
             }
+            calcularCotizacion();
         }
 
         function handleSumaAseguradaBlur() {
@@ -655,12 +856,13 @@
             if (!isNaN(value)) {
                 sumaAseguradaInput.value = value.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
+            calcularCotizacion();
         }
 
         function calcularCotizacion() {
             const circulacion = document.getElementById('circulacion').value;
             const riesgo = riesgoInput.value;
-            const ano = parseInt(anoSelect.value);
+            const ano = parseInt(anoInput.value);
             const sumaAsegurada = parseFloat(sumaAseguradaInput.value.replace(/,/g, ''));
 
             if (!circulacion || !riesgo || isNaN(ano) || isNaN(sumaAsegurada)) return;
@@ -668,18 +870,18 @@
             const currentYear = new Date().getFullYear();
             let antiguedad = currentYear - ano;
             
-            const tasasData = circulacion === 'LIMA' ? tasasLimaData : tasasProvinciaData;
+            const tasasData = zonaSeleccionada === 'LIMA' ? tasasLimaData : tasasProvinciaData;
             
             const maxAntiguedad = Math.max(...Object.keys(tasasData).map(Number));
             if (antiguedad > maxAntiguedad) {
                 antiguedad = maxAntiguedad;
             }
             
-            const tasaNeta = tasasData[antiguedad][riesgo];
+            const tasaNeta = tasasData[antiguedad] ? tasasData[antiguedad][riesgo] : 0;
             let primaNeta = (tasaNeta * sumaAsegurada) / 100;
             
             // Obtener la prima neta mínima según la ubicación y el riesgo
-            const primaNetaMinima = pnmData[circulacion][riesgo];
+            const primaNetaMinima = pnmData[zonaSeleccionada] ? pnmData[zonaSeleccionada][riesgo] : 0;
             // Asegurarse de que la prima neta no sea menor que la prima neta mínima
             primaNeta = Math.max(primaNeta, primaNetaMinima);
             
@@ -703,7 +905,7 @@
                     placa: document.getElementById('placa').value,
                     marca: marcaInput.value,
                     modelo: modeloInput.value,
-                    ano: anoSelect.value,
+                    ano: anoInput.value,
                     sumaAsegurada: parseFloat(sumaAseguradaInput.value.replace(/,/g, '')),
                 };
 
